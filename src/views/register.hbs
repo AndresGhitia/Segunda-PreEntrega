@@ -1,0 +1,24 @@
+<h1>Formulario de registro</h1>
+<p style="color:red">{{message}}</p>
+<div>
+    <form action="/api/sessions/register" method="POST" class="flex flex-col">
+        <label>Nombre: </label>
+        <input  placeholder="Nombre" type="text" id="first_name" name="first_name">
+        <br></br>
+        <label>Apellido: </label>
+        <input placeholder="Apellido"type="text" id="last_name" name="last_name">
+        <br></br>
+        <label for="date_of_birth">Fecha de Nacimiento: </label>
+        <input type="date" id="date_of_birth" name="date_of_birth" >
+        <br></br>
+        <label for="email">Email: </label>
+        <input placeholder="Your email..." type="text" id="email" name="email">
+        <br></br>
+        <label for="password">Password: </label>
+        <input placeholder="Your password..." type="password" id="password" name="password">
+        <br></br>
+        <input type="submit" value="Registrarse">
+    </form>
+        <br></br>
+        <a href="/login">Login</a>
+</div>

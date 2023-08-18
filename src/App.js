@@ -4,9 +4,13 @@ import { productsRouter } from "./routes/products.routes.js";
 import { messageModel } from "./dao/models/messsages.model.js";
 import { cartsRouter } from "./routes/carts.routes.js";
 import { viewsRouter } from "./routes/views.routes.js";
+import { sessionsRouter } from "./routes/sessions.routes.js";
 import { engine } from "express-handlebars";
 import { Server } from "socket.io";
 import { __dirname } from "./utils.js";
+import session from "express-session"
+import MongoStore from "connect-mongo"
+import FileStore from "session-file-store"
 import path from "path";
 
 const app = express();
@@ -25,13 +29,28 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "/public")));
 
+app.use(session({
+    store: MongoStore.create({
+        mongoUrl: config.mongo.url,
+        mongoOptions: {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        },
+        ttl: 1000000,
+    }),
+    secret: 'prueba123',
+    resave: false,
+    saveUninitialized: false
+}))
+
 app.use("/api/products", productsRouter);
 app.use("/api/carts", cartsRouter);
+app.use('/api/sessions', sessionsRouter)
 app.use(viewsRouter);
 
 
 io.on("connection",(socket)=>{
-    console.log("nuevo cliente conectado");
+    console.log("Nuevo cliente conectado");
 
     socket.on("authenticated",async(msg)=>{
         const messages = await messageModel.find()

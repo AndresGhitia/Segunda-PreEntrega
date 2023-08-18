@@ -4,15 +4,18 @@ import { cartService } from "../dao/index.js";
 
 const router = Router()
 
+router.get('/', (req, res) => {
+  if(req.session.user){
+      res.redirect('/products')
+  }else{
+      res.redirect('/login')
+  }
+})
+
 router.get("/realtimeproducts", async (req, res) => {
   const products = await productService.getProducts();
   res.render("realtimeproducts",{products});
 });
-
-// router.get("/", async (req, res) => {
-//   const products = await productService.getProducts();
-//   res.render("home", { products });
-// });
 
 router.get("/chat",(req,res)=>{
   res.render("chat")
@@ -50,8 +53,16 @@ router.get("/products", async (req, res) => {
     });
 
     const baseUrl = `${req.protocol}://${req.get("host")}${req.originalUrl}`;
+
+    let user = '';
+    if (req.session.user) {
+      user = req.session.user;
+    } else {
+      return res.redirect('/login');
+    }
+
     const resultProductsView = {
-      status:"success",
+      status: "success",
       payload: result.docs,
       totalPages: result.totalPages,
       page: result.page,
@@ -60,8 +71,9 @@ router.get("/products", async (req, res) => {
       prevLink: result.hasPrevPage ? baseUrl.replace(`page=${result.page}`, `page=${result.prevPage}`) : null,
       nextPage: result.nextPage,
       hasNextPage: result.hasNextPage,
-      nextLink: result.hasNextPage ? baseUrl.includes("page") ? baseUrl.replace(`page=${result.page}`, `page=${result.nextPage}`) : baseUrl.includes("?") ? baseUrl.concat(`&page=${result.nextPage}`) : baseUrl.concat(`?page=${result.nextPage}`) : null
-  }
+      nextLink: result.hasNextPage ? baseUrl.includes("page") ? baseUrl.replace(`page=${result.page}`, `page=${result.nextPage}`) : baseUrl.includes("?") ? baseUrl.concat(`&page=${result.nextPage}`) : baseUrl.concat(`?page=${result.nextPage}`) : null,
+      session: user
+    };
 
     console.log(resultProductsView);
     res.render("products", resultProductsView);
@@ -73,6 +85,14 @@ router.get("/products", async (req, res) => {
 
 router.get('/cart/:cid', async(req,res) => {
   res.render('cart', {status: 'succes', payload: await cartService.getCartById(req.params.cid)})
+})
+
+router.get('/login', async(req, res) => {
+  res.render('login', {})
+})
+
+router.get('/register', async(req, res) => {
+  res.render('register', {})
 })
 
 router.get("/api/carts", async (req, res) => {

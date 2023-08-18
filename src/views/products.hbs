@@ -1,29 +1,44 @@
-<p style="color:red"><strong>{{error}}</strong></p>
+<div>
+    {{#if session}}
+    <div>
+        <p>
+            Bienvenido: {{session.first_name}} {{session.last_name}}
+            <br></br>
+            email: {{session.email}},
+            <br></br>
+            role: {{session.role}}
+            <br></br>
+        </p>
+        <a href="/api/sessions/logout">Logout</a>
+    </div>
+    {{/if}}
 
-{{#if payload}}
+    {{#if payload}}
     <h1>Listado de Productos</h1>
     <ul>
-    {{#each payload}}
+        {{#each payload}}
         <li>
-                Nombre: {{this.title}} | Precio: {{this.price}}
+            Nombre: {{this.title}} | Precio: {{this.price}}
             <form action="/api/carts/64dad1b2610d7dac7dd8c7bf/products/{{this._id}}" method="post">
                 <button type="submit" class="addToCart" onclick="addToCart(event, '{{this._id}}')">Agregar al carrito</button>
-            </form>          
-        </li>    {{/each}}
+            </form>
+        </li>
+        {{/each}}
     </ul>
 
     {{#if hasPrevPage}}
-        <a href={{prevLink}}>Anterior</a>
+    <a href={{prevLink}}>Anterior</a>
     {{/if}}
 
     {{page}}
 
     {{#if hasNextPage}}
-        <a href={{nextLink}}>Siguiente</a>
+    <a href={{nextLink}}>Siguiente</a>
     {{/if}}
-{{else}}
+    {{else}}
     <h2>No hay productos</h2>
-{{/if}}
+    {{/if}}
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="/js/products.js"></script>

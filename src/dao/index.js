@@ -3,6 +3,7 @@ import { CartManager } from "./mannagers/fileSystem/cartsFiles.js"
 import { config } from "../config/config.js"
 import { ProductsMongo } from "./mannagers/mongo/productsMongo.js";
 import { CartsMongo } from "./mannagers/mongo/cartsMongo.js";
+import { UsersMongo } from "./mannagers/mongo/usersMongo.js";
 import { connectDB } from "../config/dbConnection.js"
 
 // const productService = new ProductManager(config.fileSystem.productsFile);
@@ -11,5 +12,6 @@ import { connectDB } from "../config/dbConnection.js"
 connectDB()
 const productService = new ProductsMongo();
 const cartService = new CartsMongo()
+const userService = new UsersMongo()
 
-export {productService, cartService}
+export {productService, cartService, userService}
