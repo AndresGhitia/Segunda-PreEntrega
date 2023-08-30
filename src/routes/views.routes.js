@@ -95,6 +95,14 @@ router.get('/register', async(req, res) => {
   res.render('register', {})
 })
 
+router.get('/faillogin', async(req, res) => {
+  res.send('Failed login.')
+})
+
+router.get('/failregister', async(req, res) => {
+  res.send('Failed register.')
+})
+
 router.get("/api/carts", async (req, res) => {
   try {
     const carts = await cartService.getCarts();

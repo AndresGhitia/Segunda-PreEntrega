@@ -10,8 +10,9 @@ import { Server } from "socket.io";
 import { __dirname } from "./utils.js";
 import session from "express-session"
 import MongoStore from "connect-mongo"
-import FileStore from "session-file-store"
 import path from "path";
+import passport from "passport";
+import {initPassport, initPassportGithub} from './config/passportConfig.js'
 
 const app = express();
 
@@ -42,6 +43,11 @@ app.use(session({
     resave: false,
     saveUninitialized: false
 }))
+
+initPassport()
+initPassportGithub()
+app.use(passport.initialize())
+app.use(passport.session())
 
 app.use("/api/products", productsRouter);
 app.use("/api/carts", cartsRouter);
