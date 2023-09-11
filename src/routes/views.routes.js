@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { productService } from "../dao/index.js";
 import { cartService } from "../dao/index.js";
+import { checkUserAuthenticated,showLoginView } from "../config/auth.js";
 
 const router = Router()
 
@@ -21,7 +22,7 @@ router.get("/chat",(req,res)=>{
   res.render("chat")
 })
 
-router.get("/products", async (req, res) => {
+router.get("/products",checkUserAuthenticated, async (req, res) => {
   try {
     const {
       limit = 10,
@@ -75,7 +76,6 @@ router.get("/products", async (req, res) => {
       session: user
     };
 
-    console.log(resultProductsView);
     res.render("products", resultProductsView);
   } catch (error) {
     console.log(error.message);
@@ -87,11 +87,11 @@ router.get('/cart/:cid', async(req,res) => {
   res.render('cart', {status: 'succes', payload: await cartService.getCartById(req.params.cid)})
 })
 
-router.get('/login', async(req, res) => {
+router.get('/login',showLoginView, async(req, res) => {
   res.render('login', {})
 })
 
-router.get('/register', async(req, res) => {
+router.get('/register',showLoginView, async(req, res) => {
   res.render('register', {})
 })
 
