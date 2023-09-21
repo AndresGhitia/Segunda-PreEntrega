@@ -1,6 +1,6 @@
 import { productsModel } from "../../models/products.model.js";
 
-export class ProductsMongo {
+export class ProductsDao {
   constructor() {
     this.model = productsModel;
   }

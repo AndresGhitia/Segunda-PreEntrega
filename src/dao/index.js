@@ -1,17 +1,12 @@
-import { ProductManager } from "./mannagers/fileSystem/productsFiles.js"
-import { CartManager } from "./mannagers/fileSystem/cartsFiles.js"
-import { config } from "../config/config.js"
-import { ProductsMongo } from "./mannagers/mongo/productsMongo.js";
-import { CartsMongo } from "./mannagers/mongo/cartsMongo.js";
-import { UsersMongo } from "./mannagers/mongo/usersMongo.js";
+import { ProductsDao } from "./mannagers/mongo/productsMongo.js";
+import { CartsDao } from "./mannagers/mongo/cartsMongo.js";
+import { UsersDao } from "./mannagers/mongo/usersMongo.js";
 import { connectDB } from "../config/dbConnection.js"
 
-// const productService = new ProductManager(config.fileSystem.productsFile);
-// const cartService = new CartManager(config.fileSystem.cartsFile)
-
 connectDB()
-const productService = new ProductsMongo();
-const cartService = new CartsMongo()
-const userService = new UsersMongo()
+
+const productService = new ProductsDao();
+const cartService = new CartsDao()
+const userService = new UsersDao()
 
 export {productService, cartService, userService}

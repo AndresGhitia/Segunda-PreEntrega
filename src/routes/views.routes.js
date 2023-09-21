@@ -1,116 +1,29 @@
 import { Router } from "express";
-import { productService } from "../dao/index.js";
 import { cartService } from "../dao/index.js";
 import { checkUserAuthenticated,showLoginView } from "../config/auth.js";
+import { ViewsControllers } from "../controllers/views.controllers.js";
 
 const router = Router()
 
-router.get('/', (req, res) => {
-  if(req.session.user){
-      res.redirect('/products')
-  }else{
-      res.redirect('/login')
-  }
-})
+router.get('/',ViewsControllers.renderHome)
 
-router.get("/realtimeproducts", async (req, res) => {
-  const products = await productService.getProducts();
-  res.render("realtimeproducts",{products});
-});
+router.get("/realtimeproducts",ViewsControllers.renderTimeProducts);
 
-router.get("/chat",(req,res)=>{
-  res.render("chat")
-})
+router.get("/chat",ViewsControllers.renderChat)
 
-router.get("/products",checkUserAuthenticated, async (req, res) => {
-  try {
-    const {
-      limit = 10,
-      page = 1,
-      stock,
-      sort = "asc",
-      category,
-    } = req.query;
+router.get("/products",checkUserAuthenticated,ViewsControllers.renderProducts );
 
-    const stockValue = stock === "0" ? undefined : parseInt(stock);
-    if (!["asc", "desc"].includes(sort)) {
-      return res.render("products", { error: "Orden no válido" });
-    }
-    const sortValue = sort === "asc" ? 1 : -1;
+router.get('/cart/:cid',ViewsControllers.renderGetCartById)
 
-    let query = {};
-    if (stockValue) {
-      query.stock = { $gte: stockValue };
-    }
-    if (category) {
-      query.category = category; 
-    }
+router.get('/login',showLoginView,ViewsControllers.renderLogin)
 
-    const result = await productService.getWithPaginate(query, {
-      page,
-      limit,
-      sort: { price: sortValue },
-      lean: true,
-    });
+router.get('/register',showLoginView,ViewsControllers.renderRegister)
 
-    const baseUrl = `${req.protocol}://${req.get("host")}${req.originalUrl}`;
+router.get('/faillogin',ViewsControllers.renderFailLogin)
 
-    let user = '';
-    if (req.session.user) {
-      user = req.session.user;
-    } else {
-      return res.redirect('/login');
-    }
+router.get('/failregister',ViewsControllers.renderFailRegister)
 
-    const resultProductsView = {
-      status: "success",
-      payload: result.docs,
-      totalPages: result.totalPages,
-      page: result.page,
-      prevPage: result.prevPage,
-      hasPrevPage: result.hasPrevPage,
-      prevLink: result.hasPrevPage ? baseUrl.replace(`page=${result.page}`, `page=${result.prevPage}`) : null,
-      nextPage: result.nextPage,
-      hasNextPage: result.hasNextPage,
-      nextLink: result.hasNextPage ? baseUrl.includes("page") ? baseUrl.replace(`page=${result.page}`, `page=${result.nextPage}`) : baseUrl.includes("?") ? baseUrl.concat(`&page=${result.nextPage}`) : baseUrl.concat(`?page=${result.nextPage}`) : null,
-      session: user
-    };
-
-    res.render("products", resultProductsView);
-  } catch (error) {
-    console.log(error.message);
-    res.render("products", { error: "No es posible visualizar los datos" });
-  }
-});
-
-router.get('/cart/:cid', async(req,res) => {
-  res.render('cart', {status: 'succes', payload: await cartService.getCartById(req.params.cid)})
-})
-
-router.get('/login',showLoginView, async(req, res) => {
-  res.render('login', {})
-})
-
-router.get('/register',showLoginView, async(req, res) => {
-  res.render('register', {})
-})
-
-router.get('/faillogin', async(req, res) => {
-  res.send('Failed login.')
-})
-
-router.get('/failregister', async(req, res) => {
-  res.send('Failed register.')
-})
-
-router.get("/api/carts", async (req, res) => {
-  try {
-    const carts = await cartService.getCarts();
-    res.json({ status: "Success", data: carts });
-  } catch (error) {
-    res.status(500).json({ status: "Error", message: error.message });
-  }
-});
+router.get("/api/carts",ViewsControllers.renderApiCarts);
 
 
 export { router as viewsRouter };
