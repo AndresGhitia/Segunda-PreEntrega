@@ -1,74 +1,46 @@
-import express from "express";
-import { config } from "./config/config.js"
-import { productsRouter } from "./routes/products.routes.js";
-import { messageModel } from "./dao/models/messsages.model.js";
-import { cartsRouter } from "./routes/carts.routes.js";
-import { viewsRouter } from "./routes/views.routes.js";
-import { sessionsRouter } from "./routes/sessions.routes.js";
-import { engine } from "express-handlebars";
-import { Server } from "socket.io";
-import { __dirname } from "./utils.js";
-import session from "express-session"
-import MongoStore from "connect-mongo"
-import path from "path";
-import passport from "passport";
-import {initPassport, initPassportGithub} from './config/passportConfig.js'
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import express from 'express';
+import { Server } from 'socket.io';
+import socketProduct from './utils/socketProducts.js';
+import socketChat from './utils/socketChat.js';
+import mainRouter from './routes/index.js';
+import handlebars from 'express-handlebars';
+import passport from 'passport';
+import { initPassport, initPassportGithub } from './config/passport.config.js';
+import cookieParser from 'cookie-parser';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 
-const port = config.server.port;
-const httpServer = app.listen(port, () => {console.log(`Server listening on port ${port}`);
+const PORT = process.env.PORT;
+const httpServer = app.listen(PORT, () => {
+  console.log('Server running on port: ' + PORT);
 });
 
-const io = new Server(httpServer);
+const hbs = handlebars.create({
+  runtimeOptions: {
+    allowProtoPropertiesByDefault: true,
+  },
+});
 
-app.engine(".hbs", engine({ extname: ".hbs" }));
-app.set("view engine", ".hbs");
-app.set("views", path.join(__dirname, "/views"));
+app.set('views', __dirname + '/views');
+app.engine('handlebars', hbs.engine);
+app.set('view engine', 'handlebars');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "/public")));
+app.use('/static', express.static(__dirname + '/public'));
+app.use(cookieParser());
 
-app.use(session({
-    store: MongoStore.create({
-        mongoUrl: config.mongo.url,
-        mongoOptions: {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        },
-        ttl: 1000000,
-    }),
-    secret: 'prueba123',
-    resave: false,
-    saveUninitialized: false
-}))
+initPassport();
+initPassportGithub();
+app.use(passport.initialize());
 
-initPassport()
-initPassportGithub()
-app.use(passport.initialize())
-app.use(passport.session())
+app.use(mainRouter);
 
-app.use("/api/products", productsRouter);
-app.use("/api/carts", cartsRouter);
-app.use('/api/sessions', sessionsRouter)
-app.use(viewsRouter);
-
-
-io.on("connection",(socket)=>{
-    console.log("Nuevo cliente conectado");
-
-    socket.on("authenticated",async(msg)=>{
-        const messages = await messageModel.find()
-        socket.emit("messageHistory", messages);
-        socket.broadcast.emit("newUser",msg);
-    });
-
-    socket.on("message",async (data)=>{
-        console.log("data", data);
-        const messageCreated = await messageModel.create(data)
-        const messages = await messageModel.find()
-
-        io.emit("messageHistory", messages);
-    })
-});
+const io = new Server(httpServer);
+socketProduct(io);
+socketChat(io);

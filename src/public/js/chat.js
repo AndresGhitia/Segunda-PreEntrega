@@ -1,54 +1,43 @@
-const socketClient = io();
+const socket = io()
 
-const chatbox = document.getElementById("chatbox");
-const chat = document.getElementById("messageLogs");
+let userEmail, userRole
 
-let user;
+fetchUserData = async () => {
+    try{
+        const res = await fetch('/api/sessions/current')
+            if (res.ok) {
+                const data = await res.json()
+                userEmail = data.payload.email
+                userRole = data.payload.role
 
-Swal.fire({
-    title:"Identificate",
-    input:"text",
-    text:"Ingresa un nombre de usuario para el chat",
-    inputValidator:(value)=>{
-        if(!value){
-            return "El nombre de usuario es obligatorio"
-        }
-    },
-    allowOutsideClick:false
-}).then((result)=>{
-    // console.log("result", result);
-    user = result.value;
-    socketClient.emit("authenticated",`usuario ${user} ha iniciado sesión`)
-    // console.log("user", user);
-});
-
-
-chatbox.addEventListener("keyup", (e)=>{
-    // console.log(e.key);
-    if(e.key === "Enter"){
-        if(chatbox.value.trim().length>0){//corrobamos que el usuario no envie datos vacios
-            socketClient.emit("message",{user:user,message:chatbox.value});
-            chatbox.value="";//borramos el campo
-        }
+                if(userRole.toUpperCase() === 'ADMIN'){
+                    input.disabled = true
+                    input.placeholder = "Admins no pueden enviar mensajes";
+                }
+            } else { throw new Error('Error al solicitar datos del ususario'); }
+    }catch(error){
+        throw error
     }
-});
+}
 
-socketClient.on("messageHistory",(dataServer)=>{
-    let messageElmts = "";
-    // console.log("dataServer", dataServer);
-    dataServer.forEach(item=>{
-        messageElmts = messageElmts + `${item.user}: ${item.message} <br/>`
-    });
-    chat.innerHTML = messageElmts;
-});
+const input = document.getElementById('text')
+const log = document.getElementById('messages')
+const date = new Date()
+const formattedDate = `${date.getHours()}:${date.getMinutes()}/${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
 
-socketClient.on("newUser",(data)=>{
-    if(user){
-        //si ya el usuario esta autenticado, entonces puede recibir notificaciones
-        Swal.fire({
-            text:data,
-            toast:true,
-            position:"top-right"
-        });
+fetchUserData()
+
+input.addEventListener('keyup', evt => {
+    if (evt.key === "Enter") {
+        socket.emit('message', { email: userEmail, message: input.value, createdAt: formattedDate })
+        input.value = ""
     }
-});
+})
+
+socket.on('log', data => {
+    let logs = ''
+    data.logs.forEach(log => {
+        logs += `<li class="w-100 bg-gray-200 py-2 px-1 rounded my-2 flex justify-between items-center"><p class="block">${log.email} says: ${log.content}</p> <span class="block text-sm text-gray-400">${log.createdAt}</span></li>`
+    })
+    log.innerHTML = logs
+})

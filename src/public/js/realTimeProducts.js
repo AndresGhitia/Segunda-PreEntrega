@@ -1,64 +1,68 @@
-const socket = io();
+const socket = io()
 
-function validarCamposYEnviar() {
-  const title = document.getElementById("messageInput1").value.trim();
-  const description = document.getElementById("messageInput2").value.trim();
-  const code = document.getElementById("messageInput3").value.trim();
-  const price = document.getElementById("messageInput4").value.trim();
-  const status = document.getElementById("messageInput5").value.trim();
-  const stock = document.getElementById("messageInput6").value.trim();
-  const category = document.getElementById("messageInput7").value.trim();
+// Get products and show them
+socket.on('products', data =>{
+    const div = document.querySelector('#products')
+    let products = ''
+    data.docs.forEach( product => {
+        products += `
+        <li class="flex justify-between">
+            <div>
+                <p class="font-semibold text-lg">${product.title}</p>
+                <p class="font-bold text-xl text-green-600 text-justify">$ ${product.price}</p>
+                <p class="max-w-lg my-2">${product.description}</p>
+                <p class="">ID: ${product.id}</p>
+                <p class="">CODE: ${product.code}</p>
+                <p class="">STATUS: ${product.status}</p>
+                <p class="">STOCK: ${product.stock}</p>
+                <p class="">CATEGORY: ${product.category}</p>
+                <p class="max-w-lg">Nº OF THUMBNAILS: ${product.thumbnails.length}</p>
+                <button id="${product._id}" class="mt-3 bg-red-700 hover:bg-red-500 text-white font-medium uppercase py-1 px-2 rounded cursor-pointer deleteButton">DELETE</button>
+            </div>
+            <div class="grid grid-cols-3">
+                ${product.thumbnails.map(thumbnail => {
+                    return `<img class="h-40" src="${thumbnail}" alt="Product image">`
+                }).join('')}
+            </div>
+        </li>
+        <hr class="my-5 border-gray-600">`
+    } )
+    div.innerHTML = products
 
-  if (!title || !description || !code || !price || !status || !stock || !category) {
-    alert('Todos los campos deben ser completados');
-    return;
-  }
+    // Delete products
+    const deleteButtons = document.querySelectorAll('.deleteButton')
+    deleteButtons.forEach(button => {
+        button.addEventListener("click", e => {
+            const productId = e.target.id
+            socket.emit('deleteProduct', productId)
+        })
+    })
+})
 
-  const productToAdd = {
-    title: title,
-    description: description,
-    code: code,
-    price: price,
-    status: status,
-    stock: stock,
-    category: category
-  };
+// Add products
+const form = document.querySelector('#form')
+form.addEventListener('submit', e => {
+    e.preventDefault()
 
-  socket.emit("messages", [productToAdd]);
+    const textareaValues = form.elements.thumbnails.value
+    const array = textareaValues.split(",")
+    const thumbnails = array.map( element => {
+        return element.trim()
+    } )
 
-  document.getElementById("messageInput1").value = "";
-  document.getElementById("messageInput2").value = "";
-  document.getElementById("messageInput3").value = "";
-  document.getElementById("messageInput4").value = "";
-  document.getElementById("messageInput5").value = "";
-  document.getElementById("messageInput6").value = "";
-  document.getElementById("messageInput7").value = "";
-}
+    const product = {
+        title: form.elements.title.value,
+        description: form.elements.description.value,
+        code: form.elements.code.value,
+        price: form.elements.price.value,
+        stock: form.elements.stock.value,
+        category: form.elements.category.value,
+        thumbnails: thumbnails
+    }
 
-// Función para mostrar los productos en la página
-function mostrarProductos(data) {
-  const productList = document.getElementById("productList");
-  productList.innerHTML = "";
+    if(product.title && product.description && product.code && product.price && product.stock && product.category && product.thumbnails){
+        socket.emit('addProduct', product)
+    }
 
-  if (Array.isArray(data) && data.length > 0) {
-    data.forEach((product) => {
-      const productDetails = document.createElement("div");
-      productDetails.innerHTML = `
-        <p>Título: ${product.title}</p>
-        <p>Descripción: ${product.description}</p>
-        <p>Código: ${product.code}</p>
-        <p>Precio: $${product.price}</p>
-        <p>Stock: ${product.stock}</p>
-        <p>Categoría: ${product.category}</p>
-        <hr>
-      `;
-      productList.appendChild(productDetails);
-    });
-  } else {
-    productList.innerHTML = "<p>No se encontraron productos.</p>";
-  }
-}
-
-socket.on("productos", (products) => {
-  mostrarProductos(products);
-});
+    form.reset()
+})
