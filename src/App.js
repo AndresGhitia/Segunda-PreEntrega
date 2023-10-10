@@ -2,20 +2,21 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import express from 'express';
 import { Server } from 'socket.io';
-import socketProduct from './utils/socketProducts.js';
-import socketChat from './utils/socketChat.js';
-import mainRouter from './routes/index.js';
 import handlebars from 'express-handlebars';
 import passport from 'passport';
-import { initPassport, initPassportGithub } from './config/passport.config.js';
 import cookieParser from 'cookie-parser';
+
+import mainRouter from './routes/index.js';
+import socketProduct from './utils/socketProducts.js';
+import socketChat from './utils/socketChat.js';
+import { initPassport, initPassportGithub } from './config/passport.config.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
-
 const PORT = process.env.PORT;
+
 const httpServer = app.listen(PORT, () => {
   console.log('Server running on port: ' + PORT);
 });

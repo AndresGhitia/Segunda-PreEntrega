@@ -1,4 +1,7 @@
 import { productService } from "../service/index.js"
+import CustomError from "../utils/CustomErrors/CustomoError.js";
+import EErrors from "../utils/CustomErrors/EErrors.js";
+import { generateProductErrorInfo } from "../utils/CustomErrors/info.js";
 
 class ProductController {
     get = async (req, res) => {
@@ -7,7 +10,7 @@ class ProductController {
             if (req.query.page) {
                 queryPage = parseInt(req.query.page);
                 if (isNaN(queryPage) || queryPage < 1) {
-                    throw new Error('Numero de pagina invalida');
+                    throw new Error('Invalid page number');
                 }
             }
     
@@ -66,13 +69,23 @@ class ProductController {
         }
     }
 
-    create = async (req, res) => {
+    create = async (req, res, next) => {
         try{
             const product = req.body
+
+            if(!product.title || !product.price || !product.code || !product.stock){
+                CustomError.createError({
+                    name: 'Product creation error',
+                    cause: generateProductErrorInfo({title: product.title, code: product.code, price: product.price, stock: product.stock}),
+                    message: 'Error trying to create a product',
+                    code: EErrors.INVALID_TYPE_ERROR
+                })
+            }
+
             const addedProduct = await productService.create(product)
             return { addedProduct }
         }catch (error){
-            throw error
+            next(error)
         }
     }
 
@@ -95,5 +108,6 @@ class ProductController {
         }
     }
 }
+
 
 export default new ProductController
