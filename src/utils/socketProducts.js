@@ -1,4 +1,5 @@
 import ProductManager from "../dao/mongo/product.mongo.js"
+import {logger} from "../config/logger.js"
 
 const productManager = new ProductManager
 
@@ -6,7 +7,7 @@ const socketProduct =  async (io) => {
     const products = await productManager.getProducts()
 
     io.on('connection', socket => {
-        console.log("Nuevo cliente conectado")
+        logger.info("Nuevo cliente conectado in /realTimeProducts")
 
         socket.emit('products', products)
 

@@ -1,30 +1,31 @@
 import mongoose from "mongoose";
+import  {logger}  from "./logger.js";
 
 class MongoSingleton {
-  static #instance;
+  static #instance
 
-  constructor() {
-    this.#connectMongoDB();
+  constructor(){
+      this.#connectMongoDB()
   }
 
-  static getInstance() {
-    if (this.#instance) {
-      console.log('Ya existe una conexión con MongoDB');
-    } else {
-      this.#instance = new MongoSingleton();
-    }
-    return this.#instance;
+  static getInstance(){
+      if(this.#instance){
+          logger.info('There is already a connection with MongoDB');
+      }else{
+          this.#instance = new MongoSingleton()
+      }
+      return this.#instance
   }
 
   #connectMongoDB = async () => {
-    try{
-        await mongoose.connect('mongodb+srv://andresghitia:Coderhouse255@cluster0.5rinmzl.mongodb.net/ecommerce?retryWrites=true&w=majority')
-        console.log('Conexion exitosa con MongoDB')
-    }catch(err){
-        console.log('No se pudo conectar con MongoDB: ' + err)
-        process.exit()
-    }
+      try{
+          await mongoose.connect(process.env.MONGO)
+          logger.info('Successfully connected to MongoDB')
+      }catch(err){
+          logger.error('Could not connect to MongoDB: ' + err)
+          process.exit()
+      }
   }
 }
 
-export default MongoSingleton;
+export default { MongoSingleton };
