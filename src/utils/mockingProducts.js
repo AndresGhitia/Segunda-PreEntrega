@@ -1,5 +1,3 @@
-import faker from "@faker-js/faker"
-
 const generateProduct = () => {
     return{
         _id: faker.database.mongodbObjectId(),

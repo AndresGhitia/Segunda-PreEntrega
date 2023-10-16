@@ -5,6 +5,7 @@ import ViewRouter from "./views.router.js";
 import CartRouter from "./carts.router.js";
 import SessionsRouter from "./sessions.router.js";
 import errorHandler from "../middlewares/errors.js";
+import {mockingProducts} from "../utils/mockingProducts.js"
 
 const mainRouter = express.Router();
 

@@ -2,8 +2,9 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
 import express from 'express';
-import {logger} from "./config/logger.js"
-import { addLogger } from './config/logger.js';
+
+import logger, { addLogger } from './config/logger.js';
+
 
 import { Server } from 'socket.io';
 import socketProduct from './utils/socketProducts.js';
@@ -26,9 +27,11 @@ const app = express();
 app.use(addLogger)
 
 const PORT = process.env.PORT;
+const ALIAS = process.env.ALIAS;
 
 const httpServer = app.listen(PORT, () => {
   logger.info('Servidor conectado en el PUERTO: ' + PORT);
+  logger.info('Conectado como: ' + ALIAS)
 });
 
 const hbs = handlebars.create({

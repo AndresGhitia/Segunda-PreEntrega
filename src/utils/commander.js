@@ -1,13 +1,14 @@
-import {logger} from '../config/logger.js';
-import {Command} from 'commander';
+import { Command } from 'commander'
+import logger from '../config/logger.js';
 
-const program = new Command();
+const program = new Command()
 
 program
-  .option('-d, --debug', 'Variable for debugging', false)
-  .option('--mode <mode>', 'Working mode', 'development')
-  .parse();
+    .option('-d', 'Variable for debugging', false)
+    .option('--mode <mode>', 'Working mode', 'development')
+program.parse();
 
-logger.info("Opciones de ejecución: ", program.opts());
+// logger.info("Opciones de Ejecucion ", program.opts());
 
-export default program;
+
+export default program

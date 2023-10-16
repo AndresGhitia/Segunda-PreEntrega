@@ -1,5 +1,5 @@
 import EErrors from '../utils/CustomErrors/EErrors.js';
-import {logger} from "../config/logger.js"
+import logger from '../config/logger.js';
 
 function errorHandler(error, req, res, next){
     logger.error("Error detected entering the Error Handler");
