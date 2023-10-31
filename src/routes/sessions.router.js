@@ -1,6 +1,6 @@
 import passport from "passport"
 import RouterClass from "./RouterClass.js"
-import generateToken  from "../utils/jwt.js"
+import generateToken from "../utils/jwt.js"
 import userController from "../controllers/users.controller.js";
 
 const authenticateJWT = passport.authenticate('current', { session: false });
@@ -20,6 +20,7 @@ class SessionRouter extends RouterClass {
             try{
                 res.sendSuccess(await userController.register(req, res, next))
             }catch(error){
+                // errorHandler
             }
         })
 
@@ -39,6 +40,30 @@ class SessionRouter extends RouterClass {
             }
         })
 
+        this.post('/recoverpassword', ['PUBLIC'], async (req, res) => {
+            try{
+                res.sendSuccess(await userController.recoverPassword(req, res))
+            }catch(error){
+                res.sendServerError(error.message)
+            }
+        })
+
+        this.post('/updatepassword', ['PUBLIC'], async (req, res) => {
+            try{
+                res.sendSuccess(await userController.updatePassword(req, res))
+            }catch(error){
+                res.sendServerError(error.message)
+            }
+        })
+
+        this.post('/premium/:uid', ['ADMIN'], async (req, res) => {
+            try{
+                res.sendSuccess(await userController.premiumUser(req, res))
+            }catch(error){
+                res.sendServerError(error.message)
+            }
+        })
+
         this.get('/github', ['PUBLIC'],authenticateGithub, async (req, res)=>{})
 
         this.get('/githubcallback', ['PUBLIC'], authenticateGithub,  async (req, res) => {
@@ -53,6 +78,5 @@ class SessionRouter extends RouterClass {
         })
     }
 }
-
 
 export default SessionRouter

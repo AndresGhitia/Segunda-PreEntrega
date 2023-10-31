@@ -70,7 +70,7 @@ export const addLogger = (req, res, next) => {
 }
 
 const objectConfig = {
-    environment: 'development' 
+    environment: 'production' 
 };
 
 let logger;

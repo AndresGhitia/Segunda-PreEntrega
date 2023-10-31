@@ -10,3 +10,26 @@ fatal: testing fatal log
 error: testing error log
 fatal: testing fatal log
 error: testing error log
+fatal: testing fatal log
+error: testing error log
+fatal: testing fatal log
+error: testing error log
+error: Error detected entering the Error Handler
+error: undefined
+error: Error detected entering the Error Handler
+error: undefined
+error: Error detected entering the Error Handler
+error: undefined
+error: undefined {"view":{"defaultEngine":"handlebars","ext":".handlebars","name":"recoverpassword","root":"C:\\Users\\AndresGh\\Documents\\BackEnd\\PrimerDesafio\\src/views"}}
+error: Error detected entering the Error Handler
+error: undefined
+error: undefined {"view":{"defaultEngine":"handlebars","ext":".handlebars","name":"recoverpassword","root":"C:\\Users\\AndresGh\\Documents\\BackEnd\\PrimerDesafio\\src/views"}}
+error: Error detected entering the Error Handler
+error: undefined
+error: jwt malformed {"name":"JsonWebTokenError"}
+error: Error detected entering the Error Handler
+error: undefined
+error: jwt malformed {"name":"JsonWebTokenError"}
+error: Error detected entering the Error Handler
+error: undefined
+error: undefined

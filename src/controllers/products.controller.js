@@ -73,6 +73,8 @@ class ProductController {
         try{
             const product = req.body
 
+            req.user.user.role === 'premium' ? product.owner = req.user.user.email : product.owner = 'admin'
+
             if(!product.title || !product.price || !product.code || !product.stock){
                 CustomError.createError({
                     name: 'Product creation error',
@@ -83,7 +85,7 @@ class ProductController {
             }
 
             const addedProduct = await productService.create(product)
-            return { addedProduct }
+            return addedProduct
         }catch (error){
             next(error)
         }
@@ -92,6 +94,11 @@ class ProductController {
     update = async (req, res) => {
         try{
             const product = req.body
+
+            if(req.user.user.role === 'premium' && req.user.user.email !== product.owner){
+                res.send({status: 'error', message: "You can't update products you don't own"})
+            }
+
             const updatedProduct = await productService.update(req.params.pid, product)
             return { updatedProduct }
         }catch (error){
@@ -101,6 +108,12 @@ class ProductController {
 
     delete = async (req, res) => {
         try{
+            const product = await productService.getById(req.params.pid)
+
+            if(req.user.user.role === 'premium' && req.user.user.email !== product.owner){
+                res.send({status: 'error', message: "You can't delete products you don't own"})
+            }
+
             const deletedProduct = await productService.delete(req.params.pid)
             return { deletedProduct }
         }catch(error){
@@ -108,6 +121,5 @@ class ProductController {
         }
     }
 }
-
 
 export default new ProductController
