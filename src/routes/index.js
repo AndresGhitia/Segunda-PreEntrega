@@ -1,12 +1,13 @@
 import express from "express";
-import cookieParser from "cookie-parser"; // Importa cookie-parser
+import cookieParser from "cookie-parser";
 import ProductRouter from "./products.router.js";
 import ViewRouter from "./views.router.js";
 import CartRouter from "./carts.router.js";
 import SessionsRouter from "./sessions.router.js";
 import errorHandler from "../middlewares/errors.js";
-import {mockingProducts} from "../utils/mockingProducts.js"
-
+import { mockingProducts } from "../utils/mockingProducts.js";
+import swaggerJsDoc from 'swagger-jsdoc';
+import swaggerUiExpress from 'swagger-ui-express'; 
 const mainRouter = express.Router();
 
 mainRouter.use(cookieParser());
@@ -32,7 +33,21 @@ mainRouter.use('/loggerTest', (req, res, next) => {
     req.logger.http('testing http log')
     req.logger.debug('testing debug log')
     res.send('Logger')
-})
+});
+
+const swaggerOptions = {
+    definition: {
+        openapi: '3.0.1',
+        info: {
+            title: 'Documentation of my eCommerce api',
+            description: 'This is the documentation of my api that I have developed for an ecommerce in the Coderhouse backend course.'
+        }
+    },
+    apis: [`./docs/**/*.yaml`]
+};
+
+const specs = swaggerJsDoc(swaggerOptions);
+mainRouter.use('/api/docs', swaggerUiExpress.serve, swaggerUiExpress.setup(specs));
 
 mainRouter.use('*', (req, res, next) => {
     res.status(404).send({ status: "error", error: 'Requested path not found' });
