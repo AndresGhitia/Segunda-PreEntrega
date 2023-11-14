@@ -33,3 +33,6 @@ error: jwt malformed {"name":"JsonWebTokenError"}
 error: Error detected entering the Error Handler
 error: undefined
 error: undefined
+error: Error detected entering the Error Handler
+error: undefined
+error: undefined

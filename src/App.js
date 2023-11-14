@@ -4,7 +4,7 @@ import { dirname } from 'path';
 import express from 'express';
 
 import logger, { addLogger } from './config/logger.js';
-
+import cors from 'cors'
 
 import { Server } from 'socket.io';
 import socketProduct from './utils/socketProducts.js';
@@ -48,6 +48,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/static', express.static(__dirname + '/public'));
 app.use(cookieParser());
+app.use(cors())
 
 initPassport();
 initPassportGithub();
