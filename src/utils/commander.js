@@ -8,7 +8,7 @@ program
     .option('--mode <mode>', 'Working mode', 'development')
 program.parse();
 
-// logger.info("Opciones de Ejecucion ", program.opts());
+logger.info("Opciones de Ejecucion ", program.opts());
 
 
 export default program

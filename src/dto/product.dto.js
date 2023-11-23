@@ -9,6 +9,7 @@ class ProductDto{
         this.code = product.code
         this.status = product.status
         this.owner = product.owner
+        this.createdAt = product.createdAt
     }
 }
 

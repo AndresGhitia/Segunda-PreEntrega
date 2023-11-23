@@ -44,6 +44,12 @@ class UserRepository{
         const result = await this.dao.deleteUser(uid)
         return result
     }
+
+    
+    async updateDocuments(uid, documentName, documentPath){
+        const result = await this.dao.updateUserDocuments(uid, documentName, documentPath)
+        return result
+    }
 }
 
 export default UserRepository

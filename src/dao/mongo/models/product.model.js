@@ -12,10 +12,16 @@ const productSchema = new mongoose.Schema({
     thumbnails: Array,
     category: {
         type: String,
-        enum: ["Distorsion", "Delay&Reverb", "Modulacion"]
+        required: true
     },
-    price: Number,
-    stock: Number,
+    price: {
+        type: Number,
+        set: value => parseFloat(value).toFixed(2)
+    },
+    stock: {
+        type: Number,
+        required: true
+    },
     status: {
         type: Boolean,
         default: true
@@ -30,6 +36,10 @@ const productSchema = new mongoose.Schema({
         type: String,
         ref: 'users',
         default: 'admin'
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now 
     }
 });
 
